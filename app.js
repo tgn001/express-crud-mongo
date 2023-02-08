@@ -4,11 +4,19 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const connection = require('./config/database-config');
+const cors = require('cors');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/employee');
 
 var app = express();
+
+app.disable('etag');
+
+app.use(cors({
+  origin: '*'
+}));
+
 
 connection();
 // view engine setup
