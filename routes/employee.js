@@ -28,7 +28,21 @@ router.get('/employees', async (req, resp, next) => {
 
   try {
     const employees = await employee.find();
-    resp.json(employees);
+
+    var records = [];
+    employees.forEach(emp => {
+      if (emp) {
+        const empsRecord =
+        {
+          id: emp._id,
+          name: emp.name,
+          role: emp.role
+        }
+        records.push(empsRecord);
+      }
+    });
+
+    resp.json(records);
   } catch (error) {
     next(error);
   }
@@ -39,7 +53,14 @@ router.get('/employee/:id', async (req, resp, next) => {
 
   try {
     const emp = await employee.findById(req.params.id);
-    resp.json(emp);
+
+    resp.json(
+      {
+        id: emp._id,
+        name: emp.name,
+        role: emp.role
+      }
+    );
 
   } catch (error) {
     next(error);
@@ -50,10 +71,16 @@ router.get('/employee/:id', async (req, resp, next) => {
 router.put('/employee/:id', async (req, resp, next) => {
 
   try {
-    const updatedEmp = await employee.findById(
-      req.params.id, req.body, {new: true});
+    const requestBody = { name: req.body.name, role: req.body.role };
 
-    await updatedEmp.save();
+    let emp_rec = await employee.findById(req.params.id);
+
+    if (!emp_rec) 
+    return res.status(404).json({ msg: 'Employee record not found' });
+
+    const updatedEmp = await employee.findByIdAndUpdate(
+      req.params.id, requestBody, { new: true });
+
     resp.json(updatedEmp);
 
   } catch (error) {
